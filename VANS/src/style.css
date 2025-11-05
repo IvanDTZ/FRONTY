@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ====== THEME VANS ====== */
+:root{
+  --color-vans-burgundy:#660000;
+  --color-vans-blue:#2233aa;
+  --color-vans-dark:#0c0c0f;
+  --color-vans-white:#f9f9f9;
+  --color-vans-gray:#111318; /* un poco + claro que #1a1a1a para contraste */
+  --font-sans:"Inter",system-ui,sans-serif;
+}
+html,body,#root{height:100%}
+body{
+  background:var(--color-vans-dark);
+  color:var(--color-vans-white);
+  font-family:var(--font-sans);
+}
+
+/* ====== UTILIDADES ====== */
+.container-app{ @apply max-w-[1600px] mx-auto p-6 space-y-6; }
+.card{ @apply rounded-2xl shadow; background:var(--color-vans-gray); }
+.card-pad{ @apply p-4 md:p-6; }
+.h1{ @apply text-3xl md:text-4xl font-extrabold tracking-wide; }
+.kpi{ @apply card card-pad flex flex-col gap-1; }
+.kpi .v{ @apply text-3xl md:text-5xl font-black; }
+.section-title{ @apply text-lg md:text-2xl font-bold; }
+.btn-chip{ @apply px-3 py-1 rounded-full border border-white/10 hover:bg-white/5 transition; }
