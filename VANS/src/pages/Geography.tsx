@@ -7,15 +7,21 @@ import { Choropleth, Bubble, Scatter, GeoHeatmap } from "../components/charts";
 import { COUNTRY_CENTER } from "../lib/geo";
 
 type Loc = { country: string; count: number };
-type Bub = { x: number | string; y: number | string; z: number | string };
-type Sc = { x: number | string; y: number | string };
+type BubblePoint = { x: number; y: number; z: number };
+type ScatterPoint = { x: number; y: number };
 
 export default function Geography() {
   const { f } = useFilters();
   const p = qs({ from: f.from, to: f.to, countries: f.countries });
+
+  // Estados crudos desde API (permitimos string|number y limpiamos en los memo)
   const [loc, setLoc] = useState<Loc[]>([]);
-  const [bubble, setBubble] = useState<Bub[]>([]);
-  const [scatter, setSc] = useState<Sc[]>([]);
+  const [bubble, setBubble] = useState<
+    Array<{ x: number | string; y: number | string; z: number | string }>
+  >([]);
+  const [scatter, setScatter] = useState<
+    Array<{ x: number | string; y: number | string }>
+  >([]);
 
   useEffect(() => {
     get(`/api/locations/${p}`).then((r) =>
@@ -25,7 +31,7 @@ export default function Geography() {
       setBubble(Array.isArray(r.data) ? r.data : [])
     );
     get(`/api/scatter/${p}`).then((r) =>
-      setSc(Array.isArray(r.data) ? r.data : [])
+      setScatter(Array.isArray(r.data) ? r.data : [])
     );
   }, [p]);
 
@@ -36,12 +42,11 @@ export default function Geography() {
         d && typeof d.country === "string" && typeof d.count !== "undefined"
     );
     if (ok.length) return ok;
-    // mock BF si no hay datos
     const bf = ["CL", "PE", "AR", "PA", "EC", "CO", "BR", "PY"];
     return bf.map((c, i) => ({ country: c, count: 50 + ((i * 13) % 120) }));
   }, [loc]);
 
-  const bubbleClean = useMemo<Bub[]>(() => {
+  const bubbleClean = useMemo<BubblePoint[]>(() => {
     const arr = (bubble || [])
       .map((d) => ({
         x: Number(d.x),
@@ -53,6 +58,7 @@ export default function Geography() {
           Number.isFinite(d.x) && Number.isFinite(d.y) && Number.isFinite(d.z)
       );
     if (arr.length) return arr;
+
     // mock si vacío
     const seed = ["CL", "PE", "AR", "PA", "EC", "CO", "BR", "PY"].length;
     return Array.from({ length: 40 }, (_, i) => ({
@@ -62,13 +68,13 @@ export default function Geography() {
     }));
   }, [bubble]);
 
-  const scatterClean = useMemo<Sc[]>(() => {
-    const arr = setSc || ([] as any); // no usar setSc, usar scatter
-    void arr;
+  const scatterClean = useMemo<ScatterPoint[]>(() => {
     const s = (scatter || [])
       .map((d) => ({ x: Number(d.x), y: Number(d.y) }))
       .filter((d) => Number.isFinite(d.x) && Number.isFinite(d.y));
     if (s.length) return s;
+
+    // mock si vacío
     return Array.from({ length: 60 }, (_, i) => ({
       x: 10_000 + ((i * 4000) % 900_000),
       y: 50 + ((i * 97) % 30_000),

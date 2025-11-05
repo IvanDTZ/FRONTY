@@ -133,8 +133,13 @@ function genNetwork(url:string){
 function genBubble(url:string){
   const {countries}=parse(url)
   const n = 40 + countries.length*5
-  return Array.from({length:n},(_,i)=>({x:Math.random()*100000,y:Math.random()*15000,z:Math.random()*300000}))
+  return Array.from({ length: n }, (_, i) => ({
+    x: Math.round(1000 + seededRand(i * 7) * 120000),
+    y: Math.round(10 + seededRand(i * 11) * 15000),
+    z: Math.round(5000 + seededRand(i * 13) * 300000),
+  }))
 }
+
 function genSankey(url:string){
   const grouped = genGrouped(url)
   const m = new Map<string, {pos:number;neu:number;neg:number}>()
