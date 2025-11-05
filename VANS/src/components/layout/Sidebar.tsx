@@ -30,12 +30,7 @@ export default function Sidebar() {
         >
           Terms & Emojis
         </NavLink>
-        <NavLink
-          to="/geography"
-          className={({ isActive }) => (isActive ? "active" : "")}
-        >
-          Geography
-        </NavLink>
+
         <NavLink
           to="/influencers"
           className={({ isActive }) => (isActive ? "active" : "")}
