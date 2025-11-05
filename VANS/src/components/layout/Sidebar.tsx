@@ -1,49 +1,65 @@
 import { NavLink } from "react-router-dom";
 
-const link = ({ isActive }: { isActive: boolean }) =>
-  `block px-4 py-3 rounded-xl transition ${
-    isActive
-      ? "bg-[var(--color-vans-burgundy)] text-white"
-      : "hover:bg-white/5 text-white/80"
-  }`;
-
 export default function Sidebar() {
   return (
-    <aside className="fixed left-0 top-0 h-screen w-64 bg-black/40 backdrop-blur border-r border-white/10 p-4 flex flex-col">
-      <div className="text-3xl font-black tracking-wide mb-2">VANS</div>
-      <div className="text-xs opacity-70 mb-6">“OFF THE WALL”</div>
-      <nav className="space-y-2">
-        <NavLink to="/" className={link}>
+    <aside className="sidebar">
+      <div className="brand">VANS</div>
+      <div className="tagline">“OFF THE WALL”</div>
+      <nav className="nav">
+        <NavLink
+          to="/"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
           Overview
         </NavLink>
-        <NavLink to="/audience" className={link}>
+        <NavLink
+          to="/audience"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
           Audience
         </NavLink>
-        <NavLink to="/demographics" className={link}>
+        <NavLink
+          to="/demographics"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
           Demographics
         </NavLink>
-        <NavLink to="/terms" className={link}>
+        <NavLink
+          to="/terms"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
           Terms & Emojis
         </NavLink>
-        <NavLink to="/geography" className={link}>
+        <NavLink
+          to="/geography"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
           Geography
         </NavLink>
-        <NavLink to="/influencers" className={link}>
+        <NavLink
+          to="/influencers"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
           Influencers
         </NavLink>
-        <NavLink to="/events" className={link}>
+        <NavLink
+          to="/events"
+          className={({ isActive }) => (isActive ? "active" : "")}
+        >
           Events
         </NavLink>
       </nav>
-      <div className="mt-auto text-[10px] opacity-50">Dashboard</div>
+      <div style={{ marginTop: "auto", opacity: 0.5, fontSize: 10 }}>
+        Dashboard
+      </div>
     </aside>
   );
 }
 
 export function Topbar() {
   return (
-    <header className="sticky top-0 z-10 bg-[var(--color-vans-burgundy)]/85 backdrop-blur border-b border-white/10">
-      <div className="px-6 py-3 h1">Social Listening</div>
+    <header className="topbar">
+      <div className="topbar-inner">Social Listening</div>
     </header>
   );
 }

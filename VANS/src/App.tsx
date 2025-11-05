@@ -13,9 +13,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <FiltersProvider>
-        <div className="flex">
+        <div className="app">
           <Sidebar />
-          <div className="flex-1 min-h-screen ml-64">
+          <div className="main">
             <Topbar />
             <Routes>
               <Route path="/" element={<Overview />} />

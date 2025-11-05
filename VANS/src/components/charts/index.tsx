@@ -16,67 +16,83 @@ import {
   Legend as LegendRaw,
 } from "recharts";
 
-/* ---------- wrappers ---------- */
 const LegendCompat: React.FC<any> = (props) =>
   React.createElement(LegendRaw as unknown as React.ComponentType<any>, props);
 
-export const E = ({ option }: { option: any }) => (
+// Paleta global eCharts
+const echartsColors = [
+  "#d74242",
+  "#5c7cff",
+  "#26c6a2",
+  "#b2bdcf",
+  "#ff6b6b",
+  "#f0ad4e",
+  "#9a6bff",
+];
+
+export const E = ({ option, h = 320 }: { option: any; h?: number }) => (
   <div className="card">
-    <ReactECharts option={option} style={{ height: 320 }} />
+    <ReactECharts
+      option={{ color: echartsColors, ...option }}
+      style={{ height: h }}
+    />
   </div>
 );
 
-/* ---------- KPI ---------- */
-export function KpiCard({
+/* KPI */
+export function Kpi({
   label,
   value,
-  suffix,
 }: {
   label: string;
   value: number | string;
-  suffix?: string;
 }) {
   return (
-    <div className="kpi">
-      <div className="text-xs opacity-70">{label}</div>
-      <div className="v">
+    <div className="card card-pad kpi">
+      <div className="label">{label}</div>
+      <div className="value">
         {typeof value === "number" ? value.toLocaleString() : value}
-        {suffix ? ` ${suffix}` : ""}
       </div>
     </div>
   );
 }
 
-/* ---------- Recharts charts ---------- */
-export function LineMentions({ data }: { data: any[] }) {
-  return (
-    <div className="card card-pad h-64">
-      <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data}>
-          <XAxis dataKey="y" />
-          <YAxis />
-          <Tooltip />
-          <Line type="monotone" dataKey="mentions" dot={false} />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
-  );
-}
-export function AreaVolume({ data }: { data: any[] }) {
-  return (
-    <div className="card card-pad h-64">
-      <ResponsiveContainer width="100%" height="100%">
-        <AreaChart data={data}>
-          <XAxis dataKey="y" />
-          <YAxis />
-          <Tooltip />
-          <Area type="monotone" dataKey="mentions" />
-        </AreaChart>
-      </ResponsiveContainer>
-    </div>
-  );
-}
-export function BarGeneric({
+/* --- Recharts con colores explícitos (evita negro) --- */
+export const LineMentions = ({ data }: { data: any[] }) => (
+  <div className="card card-pad h-320">
+    <ResponsiveContainer width="100%" height="100%">
+      <LineChart data={data}>
+        <XAxis dataKey="y" />
+        <YAxis />
+        <Tooltip />
+        <Line
+          type="monotone"
+          dataKey="mentions"
+          stroke="var(--c2)"
+          dot={false}
+        />
+      </LineChart>
+    </ResponsiveContainer>
+  </div>
+);
+export const AreaVolume = ({ data }: { data: any[] }) => (
+  <div className="card card-pad h-320">
+    <ResponsiveContainer width="100%" height="100%">
+      <AreaChart data={data}>
+        <XAxis dataKey="y" />
+        <YAxis />
+        <Tooltip />
+        <Area
+          type="monotone"
+          dataKey="mentions"
+          stroke="var(--c1)"
+          fill="var(--c1)"
+        />
+      </AreaChart>
+    </ResponsiveContainer>
+  </div>
+);
+export const BarGeneric = ({
   data,
   x,
   dataKey,
@@ -84,87 +100,73 @@ export function BarGeneric({
   data: any[];
   x: string;
   dataKey: string;
-}) {
-  return (
-    <div className="card card-pad h-64">
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data}>
-          <XAxis dataKey={x} />
-          <YAxis />
-          <Tooltip />
-          <Bar dataKey={dataKey} />
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
-  );
-}
-export function GroupedColumns({ data }: { data: any[] }) {
-  return (
-    <div className="card card-pad h-64">
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="group_key" />
-          <YAxis />
-          <Tooltip />
-          <LegendCompat />
-          <Bar dataKey="positive" />
-          <Bar dataKey="neutral" />
-          <Bar dataKey="negative" />
-        </BarChart>
-      </ResponsiveContainer>
-    </div>
-  );
-}
+}) => (
+  <div className="card card-pad h-320">
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart data={data}>
+        <XAxis dataKey={x} />
+        <YAxis />
+        <Tooltip />
+        <Bar dataKey={dataKey} fill="var(--c2)" />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+);
+export const GroupedColumns = ({ data }: { data: any[] }) => (
+  <div className="card card-pad h-320">
+    <ResponsiveContainer width="100%" height="100%">
+      <BarChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey="group_key" />
+        <YAxis />
+        <Tooltip />
+        <LegendCompat />
+        <Bar dataKey="positive" fill="var(--c3)" />
+        <Bar dataKey="neutral" fill="var(--c4)" />
+        <Bar dataKey="negative" fill="var(--c5)" />
+      </BarChart>
+    </ResponsiveContainer>
+  </div>
+);
 
-/* ---------- ECharts charts ---------- */
-export function StackedByNetwork({ data }: { data: any[] }) {
-  return (
-    <E
-      option={{
-        tooltip: {},
-        legend: {},
-        xAxis: { type: "category", data: data.map((d: any) => d.network) },
-        yAxis: { type: "value" },
-        series: [
-          {
-            type: "bar",
-            stack: "total",
-            data: data.map((d: any) => d.engagement),
-          },
-        ],
-      }}
-    />
-  );
-}
-
-export function PieSentiment({ data }: { data: any[] }) {
-  return (
-    <E
-      option={{
-        tooltip: {},
-        series: [
-          {
-            type: "pie",
-            radius: "70%",
-            data: data.map((d: any) => ({ name: d.sentiment, value: d.count })),
-          },
-        ],
-      }}
-    />
-  );
-}
-
-export function DonutPosNeg({ data }: { data: any[] }) {
-  const pos = data.find((d: any) => d.sentiment === "positive")?.count || 0;
-  const neg = data.find((d: any) => d.sentiment === "negative")?.count || 0;
+/* --- eCharts --- */
+export const StackedByNetwork = ({ data }: { data: any[] }) => (
+  <E
+    option={{
+      tooltip: {},
+      legend: {},
+      xAxis: { type: "category", data: data.map((d: any) => d.network) },
+      yAxis: { type: "value" },
+      series: [
+        { type: "bar", stack: "t", data: data.map((d: any) => d.engagement) },
+      ],
+    }}
+  />
+);
+export const PieSentiment = ({ data }: { data: any[] }) => (
+  <E
+    option={{
+      tooltip: {},
+      series: [
+        {
+          type: "pie",
+          radius: "70%",
+          data: data.map((d: any) => ({ name: d.sentiment, value: d.count })),
+        },
+      ],
+    }}
+  />
+);
+export const DonutPosNeg = ({ data }: { data: any[] }) => {
+  const pos = data.find((d: any) => d.sentiment === "positive")?.count || 0,
+    neg = data.find((d: any) => d.sentiment === "negative")?.count || 0;
   return (
     <E
       option={{
         series: [
           {
             type: "pie",
-            radius: ["50%", "80%"],
+            radius: ["50%", "78%"],
             data: [
               { name: "Positive", value: pos },
               { name: "Negative", value: neg },
@@ -174,19 +176,18 @@ export function DonutPosNeg({ data }: { data: any[] }) {
       }}
     />
   );
-}
-
-export function HeatmapInteractions({
+};
+export const HeatmapInteractions = ({
   data,
 }: {
   data: { dow: number; hr: number; v: number }[];
-}) {
+}) => {
   const dataset = data.map((d) => [d.hr, d.dow, d.v]);
   return (
     <E
       option={{
         tooltip: {},
-        grid: { top: 10 },
+        grid: { top: 10, right: 10, bottom: 40, left: 40 },
         xAxis: { type: "category", data: [...Array(24)].map((_, i) => i) },
         yAxis: {
           type: "category",
@@ -197,40 +198,41 @@ export function HeatmapInteractions({
           max: Math.max(1, ...data.map((d) => d.v)),
           orient: "horizontal",
           left: "center",
-          bottom: 0,
+          bottom: 4,
         },
         series: [{ type: "heatmap", data: dataset }],
       }}
     />
   );
-}
-
-export function Cloud({ data }: { data: { text: string; value: number }[] }) {
-  const seriesData = data.map((d) => ({ name: d.text, value: d.value }));
-  return (
-    <E
-      option={{
-        tooltip: {},
-        series: [
-          {
-            type: "wordCloud",
-            gridSize: 8,
-            sizeRange: [12, 48],
-            rotationRange: [0, 0],
-            textStyle: { color: () => undefined },
-            data: seriesData,
+};
+export const Cloud = ({
+  data,
+}: {
+  data: { text: string; value: number }[];
+}) => (
+  <E
+    option={{
+      tooltip: {},
+      series: [
+        {
+          type: "wordCloud",
+          gridSize: 8,
+          sizeRange: [12, 48],
+          rotationRange: [0, 0],
+          textStyle: {
+            color: () =>
+              echartsColors[Math.floor(Math.random() * echartsColors.length)],
           },
-        ],
-      }}
-    />
-  );
-}
+          data: data.map((d) => ({ name: d.text, value: d.value })),
+        },
+      ],
+    }}
+  />
+);
 
-export function RadarChannels({ data }: { data: any[] }) {
-  const indicators = data.map((d: any) => ({
-    name: d.channel,
-    max: Math.max(...data.map((x: any) => x.value)),
-  }));
+export const RadarChannels = ({ data }: { data: any[] }) => {
+  const max = Math.max(1, ...data.map((x: any) => x.value)),
+    indicators = data.map((d: any) => ({ name: d.channel, max }));
   return (
     <E
       option={{
@@ -245,34 +247,38 @@ export function RadarChannels({ data }: { data: any[] }) {
       }}
     />
   );
-}
-
-export function GaugeSatisfaction({ score }: { score: number }) {
-  return (
-    <E
-      option={{
-        series: [
-          {
-            type: "gauge",
-            progress: { show: true },
-            detail: { valueAnimation: true, formatter: "{value}/5" },
-            data: [{ value: score }],
+};
+export const GaugeSatisfaction = ({ score }: { score: number }) => (
+  <E
+    option={{
+      series: [
+        {
+          type: "gauge",
+          min: 0,
+          max: 5,
+          splitNumber: 5,
+          axisLine: { lineStyle: { width: 10 } },
+          progress: { show: true, width: 10 },
+          axisLabel: { formatter: (v: any) => v },
+          detail: {
+            valueAnimation: true,
+            formatter: "{value}/5",
+            fontSize: 28,
           },
-        ],
-      }}
-    />
-  );
-}
-
-export function TreemapCategories({ data }: { data: any[] }) {
-  return <E option={{ series: [{ type: "treemap", data }] }} />;
-}
-
-export function SunburstCategories({
+          data: [{ value: score }],
+        },
+      ],
+    }}
+  />
+);
+export const TreemapCategories = ({ data }: { data: any[] }) => (
+  <E option={{ series: [{ type: "treemap", data }] }} />
+);
+export const SunburstCategories = ({
   data,
 }: {
   data: { category_lvl1: string; category_lvl2: string; v: number }[];
-}) {
+}) => {
   const byL1: Record<string, any[]> = {};
   data.forEach((d) => {
     byL1[d.category_lvl1] = byL1[d.category_lvl1] || [];
@@ -289,28 +295,28 @@ export function SunburstCategories({
       }}
     />
   );
-}
-
-export function FunnelConv({ data }: { data: { stage: string; v: number }[] }) {
-  return (
-    <E
-      option={{
-        series: [
-          {
-            type: "funnel",
-            data: data.map((d) => ({ name: d.stage, value: d.v })),
-          },
-        ],
-      }}
-    />
-  );
-}
-
-export function Choropleth({
+};
+export const FunnelConv = ({
+  data,
+}: {
+  data: { stage: string; v: number }[];
+}) => (
+  <E
+    option={{
+      series: [
+        {
+          type: "funnel",
+          data: data.map((d) => ({ name: d.stage, value: d.v })),
+        },
+      ],
+    }}
+  />
+);
+export const Choropleth = ({
   data,
 }: {
   data: { country: string; count: number }[];
-}) {
+}) => {
   const [ready, setReady] = useState(false);
   useEffect(() => {
     let m = true;
@@ -321,9 +327,7 @@ export function Choropleth({
   }, []);
   if (!ready)
     return (
-      <div className="card card-pad h-80 flex items-center justify-center">
-        Cargando mapa…
-      </div>
+      <div className="card card-pad h-360 center muted">Cargando mapa…</div>
     );
   return (
     <E
@@ -341,66 +345,95 @@ export function Choropleth({
       }}
     />
   );
-}
-
-export function Bubble({
+};
+export const Bubble = ({
   data,
 }: {
-  data: { x: number; y: number; z: number }[];
-}) {
+  data: { x: number | string; y: number | string; z: number | string }[];
+}) => {
+  const clean = data
+    .map((d) => ({
+      x: Number(d.x),
+      y: Number(d.y),
+      z: Math.max(0, Number(d.z)),
+    }))
+    .filter(
+      (d) =>
+        Number.isFinite(d.x) && Number.isFinite(d.y) && Number.isFinite(d.z)
+    );
+
+  // escala de tamaño estable (evita burbujas minúsculas/gigantes)
+  const zmax = Math.max(1, ...clean.map((d) => d.z));
+  const size = (z: number) => {
+    const t = z / zmax;
+    return 6 + Math.sqrt(t) * 28; // 6–34 px
+  };
+
   return (
     <E
       option={{
-        xAxis: {},
-        yAxis: {},
+        tooltip: {
+          trigger: "item",
+          formatter: (p: any) =>
+            `x: ${p.value[0]}<br/>y: ${p.value[1]}<br/>reach: ${p.value[2]}`,
+        },
+        xAxis: {
+          type: "value",
+          name: "Seguidores",
+          splitLine: { show: false },
+        },
+        yAxis: { type: "value", name: "Engagement", splitLine: { show: true } },
         series: [
           {
             type: "scatter",
-            symbolSize: (d: any) => Math.sqrt(d[2]) || 6,
-            data: data.map((d) => [d.x, d.y, d.z]),
+            symbolSize: (v: any) => size(v[2]),
+            data: clean.map((d) => [d.x, d.y, d.z]),
+            emphasis: { focus: "series" },
           },
         ],
       }}
     />
   );
-}
-export function Scatter({ data }: { data: { x: number; y: number }[] }) {
-  return (
-    <E
-      option={{
-        xAxis: {},
-        yAxis: {},
-        series: [{ type: "scatter", data: data.map((d) => [d.x, d.y]) }],
-      }}
-    />
-  );
-}
-export function EventsTimeline({
+};
+export const Scatter = ({ data }: { data: { x: number; y: number }[] }) => (
+  <E
+    option={{
+      xAxis: {},
+      yAxis: {},
+      series: [{ type: "scatter", data: data.map((d) => [d.x, d.y]) }],
+    }}
+  />
+);
+export const EventsTimeline = ({
   data,
 }: {
   data: { y: string; title: string; kind: string }[];
-}) {
-  return (
-    <E
-      option={{
-        xAxis: { type: "category", data: data.map((d) => d.y) },
-        yAxis: { show: false },
-        series: [{ type: "line", data: data.map((_) => 1), symbolSize: 10 }],
-        tooltip: { formatter: (p: any) => data[p.dataIndex].title },
-      }}
-    />
-  );
-}
-export function Network({
+}) => (
+  <E
+    option={{
+      xAxis: { type: "category", data: data.map((d) => d.y) },
+      yAxis: { show: false },
+      series: [{ type: "line", data: data.map((_) => 1), symbolSize: 10 }],
+      tooltip: { formatter: (p: any) => data[p.dataIndex].title },
+    }}
+  />
+);
+export const Network = ({
   links,
 }: {
   links: { source: string; target: string; weight: number }[];
-}) {
+}) => {
   const nodes: Record<string, { name: string }> = {};
   links.forEach((l) => {
     nodes[l.source] = { name: l.source };
     nodes[l.target] = { name: l.target };
   });
+  if (!links.length)
+    return (
+      <div className="card card-pad h-360 center muted">
+        Sin datos de red en este rango
+      </div>
+    );
   return (
     <E
       option={{
@@ -421,4 +454,105 @@ export function Network({
       }}
     />
   );
-}
+};
+
+/* Extra */
+export const Waterfall = ({
+  data,
+}: {
+  data: { month: string; delta: number }[];
+}) => (
+  <E
+    option={{
+      tooltip: { trigger: "axis" },
+      xAxis: { type: "category", data: data.map((d) => d.month) },
+      yAxis: { type: "value" },
+      series: [
+        {
+          type: "bar",
+          data: data.map((d) => d.delta),
+          itemStyle: {
+            color: (p: any) => (p.value >= 0 ? "#26c6a2" : "#ff6b6b"),
+          },
+        },
+      ],
+    }}
+  />
+);
+export const SankeyChannels = ({
+  links,
+}: {
+  links: { from: string; to: string; value: number }[];
+}) => {
+  const nodes = Array.from(new Set(links.flatMap((l) => [l.from, l.to]))).map(
+    (name) => ({ name })
+  );
+  return (
+    <E
+      h={360}
+      option={{
+        tooltip: {},
+        series: [
+          {
+            type: "sankey",
+            data: nodes,
+            links: links.map((l) => ({
+              source: l.from,
+              target: l.to,
+              value: l.value,
+            })),
+            lineStyle: { color: "gradient" },
+          },
+        ],
+      }}
+    />
+  );
+};
+
+import { COUNTRY_CENTER } from "../../lib/geo";
+
+export const GeoHeatmap = ({
+  data,
+}: {
+  data: { country: string; count: number }[];
+}) => {
+  const pts = data
+    .map((d) => {
+      const c = COUNTRY_CENTER[d.country as keyof typeof COUNTRY_CENTER];
+      if (!c) return null;
+      const v = Number(d.count || 0);
+      return [c.lon, c.lat, v] as [number, number, number];
+    })
+    .filter(Boolean) as [number, number, number][];
+
+  return (
+    <E
+      h={360}
+      option={{
+        tooltip: {},
+        geo: {
+          map: "world",
+          roam: true,
+          itemStyle: { areaColor: "#1b1f2a", borderColor: "#111" },
+        },
+        visualMap: {
+          min: 0,
+          max: Math.max(1, ...pts.map((p) => p[2])),
+          calculable: true,
+          orient: "horizontal",
+          bottom: 6,
+          left: "center",
+        },
+        series: [
+          {
+            type: "heatmap",
+            coordinateSystem: "geo",
+            data: pts,
+            pointSize: 18,
+            blurSize: 20,
+          },
+        ],
+      }}
+    />
+  );
+};
